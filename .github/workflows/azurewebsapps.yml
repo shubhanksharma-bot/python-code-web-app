@@ -4,14 +4,14 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:    # <-- manual run support
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write     # required for OIDC
+      id-token: write
       contents: read
 
     steps:
@@ -43,9 +43,16 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Set startup command
+        run: |
+          az webapp config set \
+            --name hello-world-app-test \
+            --resource-group YOUR_RESOURCE_GROUP_NAME \
+            --startup-file "gunicorn --bind=0.0.0.0 app:app"
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: hello-world-app-test        # change this
+          app-name: hello-world-app-test
           slot-name: production
           package: .
