@@ -1,14 +1,17 @@
+name: Build and Deploy to Azure Web App
+
 on:
   push:
     branches:
       - main
+  workflow_dispatch:    # <-- manual run support
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write     # required for OIDC login
+      id-token: write     # required for OIDC
       contents: read
 
     steps:
@@ -25,20 +28,24 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Build (gunicorn check)
+      - name: Gunicorn sanity check
         run: |
-          python -c "import pkgutil, sys; assert pkgutil.find_loader('gunicorn')"
+          python - << 'EOF'
+          import pkgutil
+          assert pkgutil.find_loader("gunicorn"), "Gunicorn not installed"
+          print("Gunicorn OK")
+          EOF
 
       - name: Login to Azure using OIDC
         uses: azure/login@v2
         with:
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: hello-world-app-test   # replace with real name
-          slot-name: 'production'
+          app-name: hello-world-app-test        # change this
+          slot-name: production
           package: .
