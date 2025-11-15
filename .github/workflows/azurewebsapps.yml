@@ -48,7 +48,7 @@ jobs:
           az webapp config set \
             --name hello-world-app-test \
             --resource-group cicd_test \
-            --startup-file "gunicorn --bind=0.0.0.0 app:app"
+            --startup-command "gunicorn --bind=0.0.0.0 app:app"
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
