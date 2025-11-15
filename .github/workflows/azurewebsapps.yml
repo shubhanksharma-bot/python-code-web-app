@@ -46,9 +46,10 @@ jobs:
       - name: Set startup command
         run: |
           az webapp config set \
-            --name hello-world-app-test \
-            --resource-group cicd_test \
-            --startup-command "gunicorn --bind=0.0.0.0 app:app"
+          --resource-group cicd_test \
+          --name hello-world-app-test \
+          --linux-fx-version "PYTHON|3.11" \
+          --startup-file "gunicorn --bind=0.0.0.0 app:app"
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
