@@ -4,4 +4,4 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Hello Azure! Flask on Python 3.11."
+    return "Hi this is API test from ©ShubhankSharma2025."
